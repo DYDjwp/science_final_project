@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioplastic Synthesis</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <style>
+        :root {
+            --primary-color: #388E3C; 
+            --secondary-color: #66BB6A; 
+            --light-color: #F1F8E9; 
+            --dark-color: #1B5E20; 
+            --accent-color: #AED581; 
+            --text-color: #37474F; 
+            --light-text: #ffffff;
+            --shadow: 0 6px 18px rgba(46, 125, 50, 0.15); 
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: #f9fbf8;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 1rem;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%23ffffff' fill-opacity='0.05' d='M0 10 L10 0 L20 10 L10 20 Z'/%3E%3C/svg%3E");
+            opacity: 0.5;
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-top: 3rem;
+            margin-bottom: 1.8rem;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 0.8rem;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        
+        h3 {
+            color: var(--dark-color);
+            margin-bottom: 1.2rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .intro {
+            background: linear-gradient(to bottom right, #ffffff, #fefefe);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .intro:hover {
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.2);
+            transform: translateY(-4px);
+        }
+        
+        .material-card, .process-step {
+            background-color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .material-card:hover, .process-step:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px rgba(46, 125, 50, 0.25);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 1rem;
+            background-color: var(--light-color);
+            margin-top: 4rem;
+            border-top: 1px solid var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        .process {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .process-step {
+            text-align: center;
+            margin-bottom: 0;
+        }
+                
+        .animation-container {
+            height: 150px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin: 1.5rem auto 2rem;
+            border-radius: 8px;
+            background-color: rgba(174, 213, 129, 0.1);
+            border: 1px dashed var(--accent-color);
+        }
+        .intro-image {
+            height: 650px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin: 1.5rem auto 2rem;
+            border-radius: 8px;
+            background-color: rgba(174, 213, 129, 0.1);
+            border: 1px dashed var(--accent-color);
+        }
+
+        #pla-animation, #pha-animation, #starch-animation, #cellulose-animation {
+            height: 300px; /* 增加高度以适应3D模型 */
+        }
+
+        #pla-molecule-controls, #pha-molecule-controls, #starch-molecule-controls, #cellulose-molecule-controls {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        #pla-molecule-controls button, #pha-molecule-controls button, #starch-molecule-controls button, #cellulose-molecule-controls button {
+            padding: 6px 10px;
+            margin: 0 5px;
+            font-size: 14px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        #pla-molecule-controls button:hover, #pha-molecule-controls button:hover, #starch-molecule-controls button:hover, #cellulose-molecule-controls button:hover {
+            background-color: var(--primary-color);
+        }
+
+        #pla-loading, #pha-loading, #starch-loading, #cellulose-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: var(--primary-color);
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: var(--transition);
+        }
+        
+        .tag:hover {
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        .chain-segment {
+            position: absolute;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+
+        .chain {
+            position: absolute;
+            display: flex;
+            align-items: center;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-2deg) translateX(-1px); }
+            50% { transform: rotate(2deg) translateX(1px); }
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(-1px); }
+            50% { transform: translateX(1px); }
+        }
+
+        @keyframes flex-bend {
+             0%, 100% { transform: skewX(-1deg) rotate(1deg); }
+             50% { transform: skewX(1deg) rotate(-1deg); }
+         }
+
+        .step1-particle {
+            position: absolute;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            transition: all 2s ease-in-out;
+        }
+
+        .step2-strand {
+            position: absolute;
+            height: 4px;
+            border-radius: 2px;
+            background-color: var(--secondary-color);
+            transform-origin: left center;
+            transition: width 1.5s ease-out;
+        }
+
+        .step3-segment {
+            position: absolute;
+            width: 15px;
+            height: 6px;
+            border-radius: 3px;
+            background-color: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.5s ease-in, transform 1s ease-out;
+        }
+        
+        @media (max-width: 992px) {
+             .process {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+             }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            h2 {
+                font-size: 1.8rem;
+            }
+            h3 {
+                 font-size: 1.3rem;
+            }
+            .container {
+                padding: 0 15px;
+            }
+            header {
+                padding: 3rem 1rem;
+            }
+            .process {
+                 grid-template-columns: 1fr;
+             }
+            .animation-container {
+                height: 120px;
+            }
+            #pla-animation, #pha-animation, #starch-animation, #cellulose-animation {
+                height: 200px;
+            }
+            .material-card, .process-step {
+                padding: 1.5rem;
+            }
+        }
+
+       
+        
+        /* 纤维素提取2D动画样式 */
+        /* 细胞壁元素 */
+        .cell-wall {
+          position: absolute;
+          width: 600px;
+          height: 300px;
+          top: 50px;
+          left: 100px;
+          border-radius: 20px;
+          background-color: rgba(232, 245, 233, 0.8);
+          border: 2px solid #81C784;
+          box-shadow: 0 0 15px rgba(129, 199, 132, 0.3);
+          overflow: hidden;
+          transition: all 0.5s ease;
+          /* 缩小尺寸以适应标准容器 */
+          transform: scale(0.6);
+          transform-origin: center center;
+          width: 360px;
+          height: 120px;
+          top: 15px;
+          left: 50%;
+          margin-left: -180px;
+        }
+        
+        /* 纤维素分子 */
+        .cellulose {
+          position: absolute;
+          width: 70px;
+          height: 15px;
+          background-color: #1976D2;
+          border-radius: 5px;
+          transition: all 0.8s ease;
+          /* 缩小尺寸 */
+          width: 42px;
+          height: 9px;
+        }
+        
+        /* 木质素分子 */
+        .lignin {
+          position: absolute;
+          width: 30px;
+          height: 30px;
+          background-color: #8D6E63;
+          border-radius: 50%;
+          transition: all 0.8s ease;
+          /* 缩小尺寸 */
+          width: 18px;
+          height: 18px;
+        }
+        
+        /* 半纤维素分子 */
+        .hemicellulose {
+          position: absolute;
+          width: 40px;
+          height: 12px;
+          background-color: #81C784;
+          border-radius: 6px;
+          transition: all 0.8s ease;
+          /* 缩小尺寸 */
+          width: 24px;
+          height: 7px;
+        }
+        
+        /* 纯纤维素链 */
+        .pure-cellulose {
+          position: absolute;
+          width: 500px;
+          height: 30px;
+          top: 180px;
+          left: 150px;
+          background: linear-gradient(to right, #1976D2, #42A5F5);
+          border-radius: 15px;
+          opacity: 0;
+          transition: opacity 1s ease, transform 0.8s ease;
+          box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+          /* 缩小尺寸并调整位置 */
+          width: 300px;
+          height: 18px;
+          top: 65px;
+          left: 50%;
+          margin-left: -150px;
+        }
+        
+        /* 第一阶段特效 - 预处理 */
+        .pretreatment-effect {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: repeating-linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.05),
+            rgba(0, 0, 0, 0.05) 10px,
+            transparent 10px,
+            transparent 20px
+          );
+          opacity: 0;
+          z-index: 40;
+        }
+        
+        /* 第二阶段特效 - 热碱处理 */
+        .alkali-effect {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(to bottom, rgba(250, 250, 210, 0), rgba(250, 250, 210, 0.2));
+          opacity: 0;
+          z-index: 40;
+        }
+        
+        /* 第三阶段特效 - 漂白 */
+        .bleaching-effect {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+          opacity: 0;
+          z-index: 40;
+        }
+        
+        /* 阶段指示器 */
+        .phase-indicator {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          padding: 5px 12px;
+          background-color: rgba(0,0,0,0.7);
+          color: white;
+          border-radius: 4px;
+          font-size: 14px;
+          opacity: 0;
+          transition: opacity 0.5s ease;
+          z-index: 100;
+        }
+        
+        /* 分子动画 */
+        @keyframes vibrate {
+          0%, 100% { transform: translate(0, 0) rotate(0deg); }
+          25% { transform: translate(2px, 1px) rotate(1deg); }
+          50% { transform: translate(-1px, -2px) rotate(-1deg); }
+          75% { transform: translate(-2px, 1px) rotate(1deg); }
+        }
+        
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes wave {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        
+        @media (max-width: 768px) {
+            #extraction-viewer {
+                height: 200px;
+            }
+        }
+
+        #step1-animation {
+            height: 150px !important;
+        }
+
+        #animation-container {
+            border: 1px solid rgba(129, 199, 132, 0.3);
+            border-radius: 8px;
+            width: 98%;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Bioplastic Synthesis</h1>
+            <p>Sustainable Materials for the Future</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="intro">
+            <h2>What are Bioplastics?</h2>
+            <p>Bioplastics are plastic materials produced from renewable biomass sources such as corn starch, sugarcane, and cellulose. Unlike conventional petroleum-based plastics, bioplastics are biodegradable and more environmentally friendly.</p>
+            <p>As global awareness of environmental protection increases, bioplastics are becoming an important solution to plastic pollution problems.</p>
+            <div class="intro-image" id="intro-animation-placeholder">
+                <img src="https://bkimg.cdn.bcebos.com/pic/c71d0e384a03cfb1b211c7a0?x-bce-process=image/format,f_auto/resize,m_lfit,limit_1,w_1000,h_1000" alt="Bioplastics" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <p>The bottles are made of bioplastics</p>
+        </section>
+
+        <h2>Primary Raw Materials for Bioplastics</h2>
+        
+        <div class="material-card">
+            <h3>Starch-based Bioplastics</h3>
+            <div class="animation-container" id="starch-animation">
+                <div id="starch-loading">Loding...</div>
+            </div>
+            <div id="starch-molecule-controls">
+                <button onclick="setMoleculeStyle('stick', 'starch')">Molecular rod model</button>
+                <button onclick="setMoleculeStyle('sphere', 'starch')">Atomic sphere model</button>
+                <button onclick="setMoleculeStyle('line', 'starch')">Wireframe model</button>
+                <button onclick="resetMoleculeView('starch')">Reset perspective</button>
+            </div>
+            <p>Starch is one of the most commonly used raw materials for bioplastics, mainly sourced from corn, wheat, potatoes, and other crops.</p>
+            <p>By extracting starch from these crops and modifying it, thermoplastic starch (TPS) can be produced, which is a fully biodegradable material.</p>
+            <span class="tag">Biodegradable</span>
+            <span class="tag">Renewable</span>
+        </div>
+
+        <div class="material-card">
+            <h3>Polylactic Acid (PLA)</h3>
+            <div class="animation-container" id="pla-animation">
+                <div id="pla-loading">Loding...</div>
+            </div>
+            <div id="pla-molecule-controls">
+                <button onclick="setMoleculeStyle('stick', 'pla')">Molecular rod model</button>
+                <button onclick="setMoleculeStyle('sphere', 'pla')">Atomic sphere model</button>
+                <button onclick="setMoleculeStyle('line', 'pla')">Wireframe model</button>
+                <button onclick="resetMoleculeView('pla')">Reset perspective</button>
+            </div>
+            <p>Polylactic acid is one of the most widely used bioplastics, synthesized through polymerization of lactic acid obtained from fermentation.</p>
+            <p>Production process: First, carbohydrates are extracted from starch or sugar-containing plants (such as corn, sugarcane), then converted to lactic acid through microbial fermentation, and finally polymerized to form polylactic acid.</p>
+            <span class="tag">Compostable</span>
+            <span class="tag">Food-safe</span>
+        </div>
+
+        <div class="material-card">
+            <h3>Polyhydroxyalkanoates (PHA)</h3>
+            <div class="animation-container" id="pha-animation">
+                <div id="pha-loading">Loding...</div>
+            </div>
+            <div id="pha-molecule-controls">
+                <button onclick="setMoleculeStyle('stick', 'pha')">Molecular rod model</button>
+                <button onclick="setMoleculeStyle('sphere', 'pha')">Atomic sphere model</button>
+                <button onclick="setMoleculeStyle('line', 'pha')">Wireframe model</button>
+                <button onclick="resetMoleculeView('pha')">Reset perspective</button>
+            </div>
+            <p>PHA is an intracellular polyester synthesized by many bacteria. It exists in the body mainly as a storage substance for carbon source and energy. It has physical and chemical properties similar to those of synthetic plastics and many excellent properties that synthetic plastics do not have, such as biodegradability, biocompatibility, optical activity, piezoelectricity, gas barrier properties, etc.</p>
+            <p>Production process: Specific bacteria are cultured in an environment rich in carbon sources but lacking other nutrients. These bacteria convert the carbon source into PHA as an energy reserve, which is then extracted from the bacteria.</p>
+            <span class="tag">Marine Degradable</span>
+            <span class="tag">Versatile</span>
+        </div>
+
+        <div class="material-card">
+            <h3>Cellulose-based Bioplastics</h3>
+            <div class="animation-container" id="cellulose-animation">
+                <div id="cellulose-loading">Loding...</div>
+            </div>
+            <div id="cellulose-molecule-controls">
+                <button onclick="setMoleculeStyle('stick', 'cellulose')">molecular rod model</button>
+                <button onclick="setMoleculeStyle('sphere', 'cellulose')">Atomic sphere model</button>
+                <button onclick="setMoleculeStyle('line', 'cellulose')">Wireframe model</button>
+                <button onclick="resetMoleculeView('cellulose')">Reset perspective</button>
+            </div>
+            <p>Cellulose is a macromolecular polysaccharide composed of glucose. It is insoluble in water and general organic solvents and is the main component of plant cell walls.</p>
+            <p>Cellulose esters are derived from cellulose in which part or all of the hydroxyl groups in the cellulose are esterified with acids. These materials usually have good mechanical properties and thermal stability.</p>
+            <span class="tag">Transparent</span>
+            <span class="tag">Strong</span>
+        </div>
+
+        <h2>Bioplastic Synthesis Process</h2>
+        
+        <div class="process">
+            <div class="process-step">
+                <h3>1. Raw Material Extraction</h3>
+                <div class="animation-container" id="step1-animation">
+                    <div class="animation-container" id="animation-container">
+                        <div class="phase-indicator" id="phase-indicator"></div>
+                        <div class="cell-wall" id="cell-wall">
+                          <!-- 动态生成分子 -->
+                        </div>
+                        <div class="pure-cellulose" id="pure-cellulose"></div>
+                        
+                        <!-- 阶段特效层 -->
+                        <div class="pretreatment-effect" id="pretreatment-effect"></div>
+                        <div class="alkali-effect" id="alkali-effect"></div>
+                        <div class="bleaching-effect" id="bleaching-effect"></div>
+                      </div>
+                      
+                </div>
+                
+                <p>Raw materials are extracted from renewable bioresources, such as cellulose from plant stalks.</p>
+            </div>
+            <div class="process-step">
+                <h3>2. Biological Transformation</h3>
+                <div class="animation-container" id="step2-animation"></div>
+                <p>Converting raw materials into intermediates (such as lactic acid, hydroxy fatty acids) through biological processes like microbial fermentation or enzymatic catalysis.</p>
+            </div>
+            <div class="process-step">
+                <h3>3. Polymerization</h3>
+                <div class="animation-container" id="step3-animation"></div>
+                <p>Converting monomers or intermediates into high molecular weight polymers through chemical polymerization reactions, forming the basic structure of bioplastics.</p>
+            </div>
+        </div>
+
+        <h2>Applications and Future Prospects</h2>
+        <div class="material-card">
+            <div class="animation-container" id="future-animation-placeholder"></div>
+            <p>Bioplastics are currently widely used in packaging materials, disposable tableware, agricultural films, medical devices, and other fields. With technological advances and cost reductions, bioplastics are expected to gradually replace traditional plastics, reducing environmental pollution and achieving sustainable development.</p>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 1em;color: #666; font-size: 0.9em;">
+        <div class="container">
+            <p>© 2025 Science Final Project | Bioplastic Synthesis</p>
+            <p> All rights reserved © Evan Dou</p>
+            <p> Images sourced from the internet. If there is any infringement, please contact: <a href="mailto:evandou0908@gmail.com" style="color: inherit; text-decoration: none;">evandou0908@gmail.com</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Animation Configuration
+        const SEGMENT_SIZE = 8;
+        const CHAIN_SPACING = 2;
+        const STARCH_COLOR = '#66BB6A';
+        const PLA_COLOR = '#AED581';
+        const PHA_COLOR = '#388E3C';
+        const PROCESS_COLORS = ['#FFB74D', '#81C784', '#4DB6AC'];
+        
+        // 3D分子模型查看器
+        let plaMoleculeViewer;
+        let phaMoleculeViewer;
+        let starchMoleculeViewer;
+        let celluloseMoleculeViewer;
+
+        // Helper Functions
+        function getRandomPosition(container, elementSize) {
+            const rect = container.getBoundingClientRect();
+            const padding = parseFloat(getComputedStyle(container).paddingLeft) || 0;
+            const border = parseFloat(getComputedStyle(container).borderLeftWidth) || 0;
+            const effectiveWidth = rect.width - 2 * (padding + border);
+            const effectiveHeight = rect.height - 2 * (padding + border);
+
+            return {
+                x: padding + border + Math.random() * (effectiveWidth - elementSize),
+                y: padding + border + Math.random() * (effectiveHeight - elementSize)
+            };
+        }
+
+        function createChainSegment(color = STARCH_COLOR, size = SEGMENT_SIZE) {
+            const segment = document.createElement('div');
+            segment.className = 'chain-segment';
+            segment.style.width = `${size}px`;
+            segment.style.height = `${size}px`;
+            segment.style.backgroundColor = color;
+            return segment;
+        }
+
+        // 修改淀粉(TPS)分子模型的初始化函数，使用更复杂的结构
+        function initStarchMolecule() {
+            try {
+                if (typeof $3Dmol === 'undefined') {
+                    console.error('3Dmol库未正确加载');
+                    $('#starch-loading').text('错误：3Dmol库未加载');
+                    return;
+                }
+                
+                // 创建查看器
+                starchMoleculeViewer = $3Dmol.createViewer($("#starch-animation"), {
+                    backgroundColor: "white"
+                });
+                
+                if (!starchMoleculeViewer) {
+                    console.error('无法创建3Dmol查看器');
+                    $('#starch-loading').text('错误：无法创建查看器');
+                    return;
+                }
+
+                // 使用淀粉的更复杂多糖结构(3个糖单元连接) - 非SMILES格式而是直接使用PDB格式
+                const starchData = `HEADER    Amylopectin fragment (3 glucose units with branching)
+ATOM      1  C1  GLC A   1       2.000   1.500   0.000  1.00  0.00           C
+ATOM      2  C2  GLC A   1       2.500   0.100   0.200  1.00  0.00           C
+ATOM      3  C3  GLC A   1       4.000   0.000   0.000  1.00  0.00           C
+ATOM      4  C4  GLC A   1       4.700   1.100  -0.800  1.00  0.00           C
+ATOM      5  C5  GLC A   1       4.200   2.500  -0.500  1.00  0.00           C
+ATOM      6  C6  GLC A   1       4.800   3.500  -1.500  1.00  0.00           C
+ATOM      7  O1  GLC A   1       0.600   1.600   0.100  1.00  0.00           O
+ATOM      8  O2  GLC A   1       2.000  -0.800  -0.700  1.00  0.00           O
+ATOM      9  O3  GLC A   1       4.300  -1.300  -0.500  1.00  0.00           O
+ATOM     10  O4  GLC A   1       6.100   1.000  -0.700  1.00  0.00           O
+ATOM     11  O5  GLC A   1       2.750   2.500  -0.700  1.00  0.00           O
+ATOM     12  O6  GLC A   1       4.500   4.900  -1.300  1.00  0.00           O
+ATOM     13  H1  GLC A   1       2.200   1.800   1.000  1.00  0.00           H
+ATOM     14  H2  GLC A   1       2.300  -0.100   1.200  1.00  0.00           H
+ATOM     15  H3  GLC A   1       4.500   0.100   0.950  1.00  0.00           H
+ATOM     16  H4  GLC A   1       4.400   0.900  -1.800  1.00  0.00           H
+ATOM     17  H5  GLC A   1       4.500   2.800   0.500  1.00  0.00           H
+ATOM     18  H61 GLC A   1       4.400   3.200  -2.500  1.00  0.00           H
+ATOM     19  H62 GLC A   1       5.900   3.400  -1.500  1.00  0.00           H
+ATOM     20  HO1 GLC A   1       0.200   0.800   0.400  1.00  0.00           H
+ATOM     21  HO2 GLC A   1       1.100  -0.900  -0.400  1.00  0.00           H
+ATOM     22  HO3 GLC A   1       5.200  -1.500  -0.200  1.00  0.00           H
+ATOM     23  HO6 GLC A   1       3.600   5.100  -1.400  1.00  0.00           H
+ATOM     24  C1  GLC A   2       6.800   2.000  -1.400  1.00  0.00           C
+ATOM     25  C2  GLC A   2       8.300   1.800  -1.200  1.00  0.00           C
+ATOM     26  C3  GLC A   2       9.000   3.000  -1.800  1.00  0.00           C
+ATOM     27  C4  GLC A   2       8.600   4.300  -1.100  1.00  0.00           C
+ATOM     28  C5  GLC A   2       7.100   4.500  -1.000  1.00  0.00           C
+ATOM     29  C6  GLC A   2       6.700   5.700  -0.150  1.00  0.00           C
+ATOM     30  O2  GLC A   2       8.700   0.600  -1.900  1.00  0.00           O
+ATOM     31  O3  GLC A   2      10.400   2.800  -1.700  1.00  0.00           O
+ATOM     32  O4  GLC A   2       9.200   5.400  -1.800  1.00  0.00           O
+ATOM     33  O5  GLC A   2       6.500   3.300  -0.500  1.00  0.00           O
+ATOM     34  O6  GLC A   2       5.300   5.900  -0.000  1.00  0.00           O
+ATOM     35  H1  GLC A   2       6.500   2.000  -2.450  1.00  0.00           H
+ATOM     36  H2  GLC A   2       8.600   1.800  -0.150  1.00  0.00           H
+ATOM     37  H3  GLC A   2       8.700   3.050  -2.850  1.00  0.00           H
+ATOM     38  H4  GLC A   2       9.000   4.300  -0.100  1.00  0.00           H
+ATOM     39  H5  GLC A   2       6.800   4.700  -2.050  1.00  0.00           H
+ATOM     40  H61 GLC A   2       7.200   5.600   0.800  1.00  0.00           H
+ATOM     41  H62 GLC A   2       7.050   6.600  -0.650  1.00  0.00           H
+ATOM     42  HO2 GLC A   2       8.600  -0.100  -1.300  1.00  0.00           H
+ATOM     43  HO3 GLC A   2      10.800   3.600  -2.000  1.00  0.00           H
+ATOM     44  HO4 GLC A   2       8.900   5.400  -2.700  1.00  0.00           H
+ATOM     45  C1  GLC A   3      10.800   2.400  -0.400  1.00  0.00           C
+ATOM     46  C2  GLC A   3      12.300   2.200  -0.300  1.00  0.00           C
+ATOM     47  C3  GLC A   3      13.000   3.500  -0.700  1.00  0.00           C
+ATOM     48  C4  GLC A   3      12.600   4.600   0.300  1.00  0.00           C
+ATOM     49  C5  GLC A   3      11.100   4.800   0.400  1.00  0.00           C
+ATOM     50  C6  GLC A   3      10.700   5.800   1.500  1.00  0.00           C
+ATOM     51  O1  GLC A   3      10.200   1.200  -0.000  1.00  0.00           O
+ATOM     52  O2  GLC A   3      12.700   1.200  -1.200  1.00  0.00           O
+ATOM     53  O3  GLC A   3      14.400   3.300  -0.700  1.00  0.00           O
+ATOM     54  O4  GLC A   3      13.200   5.800   0.000  1.00  0.00           O
+ATOM     55  O5  GLC A   3      10.500   3.500   0.700  1.00  0.00           O
+ATOM     56  O6  GLC A   3       9.300   6.000   1.600  1.00  0.00           O
+ATOM     57  H1  GLC A   3      10.500   3.100   0.350  1.00  0.00           H
+ATOM     58  H2  GLC A   3      12.600   2.000   0.700  1.00  0.00           H
+ATOM     59  H3  GLC A   3      12.700   3.800  -1.700  1.00  0.00           H
+ATOM     60  H4  GLC A   3      13.000   4.300   1.300  1.00  0.00           H
+ATOM     61  H5  GLC A   3      10.800   5.200  -0.600  1.00  0.00           H
+ATOM     62  H61 GLC A   3      11.200   5.400   2.400  1.00  0.00           H
+ATOM     63  H62 GLC A   3      11.050   6.800   1.300  1.00  0.00           H
+ATOM     64  HO1 GLC A   3       9.300   1.300  -0.300  1.00  0.00           H
+ATOM     65  HO2 GLC A   3      12.200   0.400  -1.000  1.00  0.00           H
+ATOM     66  HO3 GLC A   3      14.700   3.100   0.200  1.00  0.00           H
+ATOM     67  HO4 GLC A   3      12.800   6.200  -0.800  1.00  0.00           H
+ATOM     68  HO6 GLC A   3       9.000   6.600   0.900  1.00  0.00           H
+CONECT    1    2    7   11   13
+CONECT    2    1    3    8   14
+CONECT    3    2    4    9   15
+CONECT    4    3    5   10   16
+CONECT    5    4    6   11   17
+CONECT    6    5   12   18   19
+CONECT    7    1   20
+CONECT    8    2   21
+CONECT    9    3   22
+CONECT   10    4   24
+CONECT   11    1    5
+CONECT   12    6   23
+CONECT   13    1
+CONECT   14    2
+CONECT   15    3
+CONECT   16    4
+CONECT   17    5
+CONECT   18    6
+CONECT   19    6
+CONECT   20    7
+CONECT   21    8
+CONECT   22    9
+CONECT   23   12
+CONECT   24   10   25   33   35
+CONECT   25   24   26   30   36
+CONECT   26   25   27   31   37
+CONECT   27   26   28   32   38
+CONECT   28   27   29   33   39
+CONECT   29   28   34   40   41
+CONECT   30   25   42
+CONECT   31   26   45
+CONECT   32   27   44
+CONECT   33   24   28
+CONECT   34   29
+CONECT   35   24
+CONECT   36   25
+CONECT   37   26
+CONECT   38   27
+CONECT   39   28
+CONECT   40   29
+CONECT   41   29
+CONECT   42   30
+CONECT   43   31
+CONECT   44   32
+CONECT   45   31   46   51   57
+CONECT   46   45   47   52   58
+CONECT   47   46   48   53   59
+CONECT   48   47   49   54   60
+CONECT   49   48   50   55   61
+CONECT   50   49   56   62   63
+CONECT   51   45   64
+CONECT   52   46   65
+CONECT   53   47   66
+CONECT   54   48   67
+CONECT   55   49
+CONECT   56   50   68
+CONECT   57   45
+CONECT   58   46
+CONECT   59   47
+CONECT   60   48
+CONECT   61   49
+CONECT   62   50
+CONECT   63   50
+CONECT   64   51
+CONECT   65   52
+CONECT   66   53
+CONECT   67   54
+CONECT   68   56
+END`;
+
+                // 添加模型并设置样式
+                starchMoleculeViewer.addModel(starchData, "pdb");
+                
+                // 设置更美观的样式和颜色 - 淀粉使用温暖的黄褐色系
+                starchMoleculeViewer.setStyle({}, {stick:{radius:0.15}, sphere:{scale:0.25}});
+                starchMoleculeViewer.setStyle({elem: 'C'}, {stick:{color:'#FFA000'}});
+                starchMoleculeViewer.setStyle({elem: 'O'}, {stick:{color:'#FF5252'}, sphere:{scale:0.35, color:'#FF5252'}});
+                starchMoleculeViewer.setStyle({elem: 'H'}, {stick:{radius:0.05, color:'#FFFFFF'}, sphere:{scale:0.15, color:'#FFFFFF'}});
+                
+                // 高亮显示葡萄糖环，突出淀粉特征结构
+                starchMoleculeViewer.setStyle({resn: 'GLC', atom: ['C1','C2','C3','C4','C5','O5']}, 
+                                              {stick:{color:'#FF8F00', radius:0.2}, sphere:{scale:0.3, color:'#FF8F00'}});
+                
+                // 高亮显示连接键，突出α-1,4和α-1,6糖苷键
+                starchMoleculeViewer.setStyle({serial: [10, 31]}, {stick:{color:'#64DD17', radius:0.25}, sphere:{scale:0.4, color:'#64DD17'}});
+                
+                // 调整视角以展示淀粉的分支结构
+                starchMoleculeViewer.zoomTo();
+                starchMoleculeViewer.zoom(0.65);
+                starchMoleculeViewer.rotate(60, {x:1, y:0, z:0});
+                starchMoleculeViewer.rotate(15, {x:0, y:1, z:0});
+                starchMoleculeViewer.center();
+                starchMoleculeViewer.render();
+                
+                // 隐藏加载提示
+                $('#starch-loading').hide();
+                
+                // 自动旋转动画
+                animateMolecule(starchMoleculeViewer);
+                
+                console.log('TPS 3D分子模型已成功加载');
+            } catch (error) {
+                console.error('加载淀粉3D模型时出错:', error);
+                $('#starch-loading').text('错误：' + error.message);
+            }
+        }
+
+        // 初始化 PLA 3D分子模型
+        function initPLAMolecule() {
+            try {
+                if (typeof $3Dmol === 'undefined') {
+                    console.error('3Dmol库未正确加载');
+                    $('#pla-loading').text('错误：3Dmol库未加载');
+                    return;
+                }
+                
+                // 创建查看器
+                plaMoleculeViewer = $3Dmol.createViewer($("#pla-animation"), {
+                    backgroundColor: "white"
+                });
+                
+                if (!plaMoleculeViewer) {
+                    console.error('无法创建3Dmol查看器');
+                    $('#pla-loading').text('错误：无法创建查看器');
+                    return;
+                }
+
+                // PLA聚合物链(4个单元)数据 - 更复杂的结构
+                const pdbData = `HEADER    PLA polymer chain (4 units)
+ATOM      1  C   UNL     1       0.000   0.000   0.000  1.00  0.00           C  
+ATOM      2  C   UNL     1       1.520   0.000   0.000  1.00  0.00           C  
+ATOM      3  O   UNL     1       2.080   1.110   0.300  1.00  0.00           O  
+ATOM      4  O   UNL     1       2.080  -1.030  -0.300  1.00  0.00           O  
+ATOM      5  C   UNL     1      -0.540  -1.380  -0.450  1.00  0.00           C  
+ATOM      6  O   UNL     1      -0.420  -2.350   0.360  1.00  0.00           O  
+ATOM      7  O   UNL     1      -1.080  -1.440  -1.550  1.00  0.00           O  
+ATOM      8  H   UNL     1      -0.350   0.220   1.010  1.00  0.00           H  
+ATOM      9  H   UNL     1      -0.380   0.770  -0.680  1.00  0.00           H  
+ATOM     10  C   UNL     2       3.500  -1.130  -0.350  1.00  0.00           C
+ATOM     11  C   UNL     2       4.100  -2.380   0.250  1.00  0.00           C
+ATOM     12  O   UNL     2       3.420  -3.100   1.050  1.00  0.00           O
+ATOM     13  C   UNL     2       4.200  -0.050  -1.100  1.00  0.00           C
+ATOM     14  H   UNL     2       3.750   0.920  -0.900  1.00  0.00           H
+ATOM     15  H   UNL     2       4.150  -0.250  -2.170  1.00  0.00           H
+ATOM     16  O   UNL     2       5.540  -2.580   0.050  1.00  0.00           O
+ATOM     17  C   UNL     3       6.280  -3.750   0.380  1.00  0.00           C
+ATOM     18  C   UNL     3       7.750  -3.450   0.150  1.00  0.00           C
+ATOM     19  O   UNL     3       8.180  -2.320   0.350  1.00  0.00           O
+ATOM     20  C   UNL     3       5.850  -4.950  -0.450  1.00  0.00           C
+ATOM     21  H   UNL     3       6.050  -3.950   1.430  1.00  0.00           H
+ATOM     22  H   UNL     3       4.780  -5.070  -0.280  1.00  0.00           H
+ATOM     23  H   UNL     3       6.380  -5.850  -0.120  1.00  0.00           H
+ATOM     24  O   UNL     3       8.500  -4.450  -0.250  1.00  0.00           O
+ATOM     25  C   UNL     4       9.930  -4.280  -0.500  1.00  0.00           C
+ATOM     26  C   UNL     4      10.680  -5.600  -0.380  1.00  0.00           C
+ATOM     27  O   UNL     4      10.150  -6.650  -0.080  1.00  0.00           O
+ATOM     28  C   UNL     4      10.080  -3.300  -1.650  1.00  0.00           C
+ATOM     29  H   UNL     4      10.350  -3.850   0.380  1.00  0.00           H
+ATOM     30  H   UNL     4       9.600  -2.340  -1.450  1.00  0.00           H
+ATOM     31  H   UNL     4       9.650  -3.700  -2.570  1.00  0.00           H
+ATOM     32  O   UNL     4      11.980  -5.550  -0.580  1.00  0.00           O
+ATOM     33  H   UNL     4      12.400  -6.400  -0.400  1.00  0.00           H
+CONECT    1    2    5    8    9
+CONECT    2    1    3    4
+CONECT    3    2
+CONECT    4    2   10
+CONECT    5    1    6    7
+CONECT    6    5
+CONECT    7    5
+CONECT    8    1
+CONECT    9    1
+CONECT   10    4   11   13
+CONECT   11   10   12   16
+CONECT   12   11
+CONECT   13   10   14   15
+CONECT   14   13
+CONECT   15   13
+CONECT   16   11   17
+CONECT   17   16   18   20   21
+CONECT   18   17   19   24
+CONECT   19   18
+CONECT   20   17   22   23
+CONECT   21   17
+CONECT   22   20
+CONECT   23   20
+CONECT   24   18   25
+CONECT   25   24   26   28   29
+CONECT   26   25   27   32
+CONECT   27   26
+CONECT   28   25   30   31
+CONECT   29   25
+CONECT   30   28
+CONECT   31   28
+CONECT   32   26   33
+CONECT   33   32
+END`;
+
+                // 添加模型并设置样式
+                plaMoleculeViewer.addModel(pdbData, "pdb");
+                
+                // 设置更美观的样式和颜色
+                plaMoleculeViewer.setStyle({}, {stick:{radius:0.15, colorscheme:'cyanCarbon'}, sphere:{scale:0.25}});
+                plaMoleculeViewer.setStyle({elem: 'C'}, {stick:{color:'#66BB6A'}});
+                plaMoleculeViewer.setStyle({elem: 'O'}, {stick:{color:'#FF5252'}, sphere:{scale:0.35, color:'#FF5252'}});
+                plaMoleculeViewer.setStyle({elem: 'H'}, {stick:{radius:0.05, color:'#FFFFFF'}, sphere:{scale:0.2, color:'#FFFFFF'}});
+                
+                // 调整视角
+                plaMoleculeViewer.zoomTo();
+                plaMoleculeViewer.zoom(0.8);
+                plaMoleculeViewer.rotate(30, {x:1, y:0, z:0}); // 稍微旋转以展示螺旋结构
+                plaMoleculeViewer.rotate(20, {x:0, y:1, z:0});
+                plaMoleculeViewer.center();
+                plaMoleculeViewer.render();
+                
+                // 隐藏加载提示
+                $('#pla-loading').hide();
+                
+                // 自动旋转动画
+                animateMolecule(plaMoleculeViewer);
+                
+                console.log('PLA 3D分子模型已成功加载');
+            } catch (error) {
+                console.error('加载PLA 3D分子模型时出错:', error);
+                $('#pla-loading').text('错误：' + error.message);
+            }
+        }
+        
+        // 初始化 PHA 3D分子模型
+        function initPHAMolecule() {
+            try {
+                if (typeof $3Dmol === 'undefined') {
+                    console.error('3Dmol库未正确加载');
+                    $('#pha-loading').text('错误：3Dmol库未加载');
+                    return;
+                }
+                
+                // 创建查看器
+                phaMoleculeViewer = $3Dmol.createViewer($("#pha-animation"), {
+                    backgroundColor: "white"
+                });
+                
+                if (!phaMoleculeViewer) {
+                    console.error('无法创建3Dmol查看器');
+                    $('#pha-loading').text('错误：无法创建查看器');
+                    return;
+                }
+
+                // PHA聚合物链(P3HB，5个单元)数据 - 更复杂的结构
+                const phaData = `HEADER    PHA polymer chain (5 units)
+ATOM      1  C   UNL     1      -0.714   1.228   0.000  1.00  0.00           C  
+ATOM      2  C   UNL     1       0.000   0.000   0.000  1.00  0.00           C  
+ATOM      3  C   UNL     1       1.429   0.000   0.000  1.00  0.00           C  
+ATOM      4  O   UNL     1       2.143  -1.228   0.000  1.00  0.00           O  
+ATOM      5  O   UNL     1       2.143   1.228   0.000  1.00  0.00           O  
+ATOM      6  O   UNL     1      -1.429  -0.000   0.000  1.00  0.00           O  
+ATOM      7  H   UNL     1      -1.429   2.000   0.000  1.00  0.00           H  
+ATOM      8  H   UNL     1       0.000   2.000   0.000  1.00  0.00           H  
+ATOM      9  H   UNL     1      -0.714  -1.228   0.000  1.00  0.00           H 
+ATOM     10  C   UNL     2       3.600  -1.200   0.100  1.00  0.00           C
+ATOM     11  C   UNL     2       4.300   0.100   0.400  1.00  0.00           C
+ATOM     12  C   UNL     2       5.800   0.000   0.500  1.00  0.00           C
+ATOM     13  O   UNL     2       6.500  -1.000   0.400  1.00  0.00           O
+ATOM     14  O   UNL     2       6.300   1.200   0.700  1.00  0.00           O
+ATOM     15  H   UNL     2       3.850  -1.950  -0.650  1.00  0.00           H
+ATOM     16  H   UNL     2       3.900  -1.600   1.070  1.00  0.00           H
+ATOM     17  H   UNL     2       4.000   0.500   1.370  1.00  0.00           H
+ATOM     18  H   UNL     2       4.000   0.850  -0.350  1.00  0.00           H
+ATOM     19  C   UNL     3       7.700   1.300   0.850  1.00  0.00           C
+ATOM     20  C   UNL     3       8.500   0.050   0.550  1.00  0.00           C
+ATOM     21  C   UNL     3       9.950   0.150   0.800  1.00  0.00           C
+ATOM     22  O   UNL     3      10.650  -0.850   0.700  1.00  0.00           O
+ATOM     23  O   UNL     3      10.450   1.350   1.100  1.00  0.00           O
+ATOM     24  H   UNL     3       7.950   2.100   0.150  1.00  0.00           H
+ATOM     25  H   UNL     3       7.900   1.650   1.850  1.00  0.00           H
+ATOM     26  H   UNL     3       8.250  -0.750   1.250  1.00  0.00           H
+ATOM     27  H   UNL     3       8.300  -0.300  -0.450  1.00  0.00           H
+ATOM     28  C   UNL     4      11.850   1.450   1.300  1.00  0.00           C
+ATOM     29  C   UNL     4      12.650   0.200   1.000  1.00  0.00           C
+ATOM     30  C   UNL     4      14.100   0.300   1.250  1.00  0.00           C
+ATOM     31  O   UNL     4      14.800  -0.700   1.150  1.00  0.00           O
+ATOM     32  O   UNL     4      14.600   1.500   1.550  1.00  0.00           O
+ATOM     33  H   UNL     4      12.100   2.250   0.600  1.00  0.00           H
+ATOM     34  H   UNL     4      12.050   1.800   2.300  1.00  0.00           H
+ATOM     35  H   UNL     4      12.400  -0.600   1.700  1.00  0.00           H
+ATOM     36  H   UNL     4      12.450  -0.150   0.000  1.00  0.00           H
+ATOM     37  C   UNL     5      16.000   1.600   1.750  1.00  0.00           C
+ATOM     38  C   UNL     5      16.800   0.350   1.450  1.00  0.00           C
+ATOM     39  C   UNL     5      18.250   0.450   1.700  1.00  0.00           C
+ATOM     40  O   UNL     5      18.950  -0.550   1.600  1.00  0.00           O
+ATOM     41  O   UNL     5      18.750   1.650   2.000  1.00  0.00           O
+ATOM     42  H   UNL     5      16.250   2.400   1.050  1.00  0.00           H
+ATOM     43  H   UNL     5      16.200   1.950   2.750  1.00  0.00           H
+ATOM     44  H   UNL     5      16.550  -0.450   2.150  1.00  0.00           H
+ATOM     45  H   UNL     5      16.600   0.000   0.450  1.00  0.00           H
+ATOM     46  H   UNL     5      19.700   1.700   2.150  1.00  0.00           H
+CONECT    1    2    6    7    8
+CONECT    2    1    3    9
+CONECT    3    2    4    5
+CONECT    4    3   10
+CONECT    5    4    6   11   12
+CONECT    6    5   13   14   15
+CONECT    7    1   16
+CONECT    8    2   17
+CONECT    9    3   18
+CONECT   10    4   19
+CONECT   11    5   20
+CONECT   12    5   21
+CONECT   13    6
+CONECT   14    2
+CONECT   15    3
+CONECT   16    7
+CONECT   17    8
+CONECT   18    9
+CONECT   19   10
+CONECT   20   11
+CONECT   21   12
+CONECT   22   13
+CONECT   23   14   24   28   30
+CONECT   24   23   25   29   31
+CONECT   25   24   26   32   33
+CONECT   26   25   27   34   35
+CONECT   27   26   28   36   37
+CONECT   28   23   29
+CONECT   29   24   30
+CONECT   30   25   31
+CONECT   31   24   32
+CONECT   32   25   33
+CONECT   33   26   34
+CONECT   34   27   35
+CONECT   35   27   36
+CONECT   36   28   37
+CONECT   37   29   38   42   43
+CONECT   38   37   39   44   45
+CONECT   39   38   40   41
+CONECT   40   39
+CONECT   41   39   46
+CONECT   42   37
+CONECT   43   37
+CONECT   44   38
+CONECT   45   38
+CONECT   46   41
+END`;
+
+                // 添加模型并设置样式
+                phaMoleculeViewer.addModel(phaData, "pdb");
+                
+                // 设置更美观的样式和颜色
+                phaMoleculeViewer.setStyle({}, {stick:{radius:0.15, colorscheme:'greenCarbon'}, sphere:{scale:0.25}});
+                phaMoleculeViewer.setStyle({elem: 'C'}, {stick:{color:'#388E3C'}});
+                phaMoleculeViewer.setStyle({elem: 'O'}, {stick:{color:'#FF5252'}, sphere:{scale:0.35, color:'#FF5252'}});
+                phaMoleculeViewer.setStyle({elem: 'H'}, {stick:{radius:0.05, color:'#FFFFFF'}, sphere:{scale:0.2, color:'#FFFFFF'}});
+                
+                // 高亮显示侧链甲基，显示PHA的结构特点
+                phaMoleculeViewer.setStyle({serial: [1,10,19,28,37]}, {stick:{color:'#FFC107', radius:0.2}, sphere:{scale:0.4, color:'#FFC107'}});
+                
+                // 调整视角 - 更好地展示PHA螺旋结构
+                phaMoleculeViewer.zoomTo();
+                phaMoleculeViewer.zoom(0.6);
+                phaMoleculeViewer.rotate(45, {x:1, y:0, z:0});
+                phaMoleculeViewer.rotate(30, {x:0, y:1, z:0});
+                phaMoleculeViewer.center();
+                phaMoleculeViewer.render();
+                
+                // 隐藏加载提示
+                $('#pha-loading').hide();
+                
+                // 自动旋转动画
+                animateMolecule(phaMoleculeViewer);
+                
+                console.log('PHA 3D分子模型已成功加载');
+            } catch (error) {
+                console.error('加载PHA 3D分子模型时出错:', error);
+                $('#pha-loading').text('错误：' + error.message);
+            }
+        }
+        
+        // 初始化纤维素3D分子模型
+        function initCelluloseMolecule() {
+            try {
+                if (typeof $3Dmol === 'undefined') {
+                    console.error('3Dmol库未正确加载');
+                    $('#cellulose-loading').text('错误：3Dmol库未加载');
+                    return;
+                }
+                
+                // 创建查看器
+                celluloseMoleculeViewer = $3Dmol.createViewer($("#cellulose-animation"), {
+                    backgroundColor: "white"
+                });
+                
+                if (!celluloseMoleculeViewer) {
+                    console.error('无法创建3Dmol查看器');
+                    $('#cellulose-loading').text('错误：无法创建查看器');
+                    return;
+                }
+
+                try {
+                    // 尝试直接使用PDB格式代替SMILES，更可靠
+                    const cellulosePDB = `HEADER    CELLULOSE FRAGMENT
+ATOM      1  C1  GLC A   1       0.000   0.000   0.000  1.00  0.00
+ATOM      2  C2  GLC A   1       1.435   0.000   0.000  1.00  0.00
+ATOM      3  C3  GLC A   1       2.000   1.426   0.000  1.00  0.00
+ATOM      4  C4  GLC A   1       1.426   2.000   1.213  1.00  0.00
+ATOM      5  C5  GLC A   1      -0.104   2.000   1.213  1.00  0.00
+ATOM      6  C6  GLC A   1      -0.696   2.558   2.505  1.00  0.00
+ATOM      7  O1  GLC A   1      -0.348  -1.000  -0.922  1.00  0.00
+ATOM      8  O2  GLC A   1       1.926  -0.518  -1.213  1.00  0.00
+ATOM      9  O3  GLC A   1       3.426   1.425   0.000  1.00  0.00
+ATOM     10  O4  GLC A   1       1.926   3.300   1.500  1.00  0.00
+ATOM     11  O5  GLC A   1      -0.570   0.634   1.213  1.00  0.00
+ATOM     12  O6  GLC A   1      -2.123   2.467   2.505  1.00  0.00
+ATOM     13  H1  GLC A   1      -0.348   0.340   0.978  1.00  0.00
+ATOM     14  H2  GLC A   1       1.797  -0.521   0.894  1.00  0.00
+ATOM     15  H3  GLC A   1       1.726   1.968  -0.915  1.00  0.00
+ATOM     16  H4  GLC A   1       1.717   1.458   2.128  1.00  0.00
+ATOM     17  H5  GLC A   1      -0.396   2.552   0.319  1.00  0.00
+ATOM     18  H61 GLC A   1      -0.414   3.620   2.581  1.00  0.00
+ATOM     19  H62 GLC A   1      -0.290   2.066   3.399  1.00  0.00
+ATOM     20  C1  GLC A   2       3.350   3.300   1.500  1.00  0.00
+ATOM     21  C2  GLC A   2       3.926   4.626   1.787  1.00  0.00
+ATOM     22  C3  GLC A   2       5.426   4.626   1.787  1.00  0.00
+ATOM     23  C4  GLC A   2       5.991   4.108   3.000  1.00  0.00
+ATOM     24  C5  GLC A   2       5.417   2.782   3.287  1.00  0.00
+ATOM     25  C6  GLC A   2       5.991   2.264   4.579  1.00  0.00
+ATOM     26  O2  GLC A   2       3.467   5.144   3.000  1.00  0.00
+ATOM     27  O3  GLC A   2       5.875   3.787   0.713  1.00  0.00
+ATOM     28  O4  GLC A   2       7.417   4.108   3.000  1.00  0.00
+ATOM     29  O5  GLC A   2       3.991   2.782   3.287  1.00  0.00
+ATOM     30  O6  GLC A   2       5.417   0.971   4.866  1.00  0.00
+ATOM     31  H1  GLC A   2       3.709   2.959   0.522  1.00  0.00
+ATOM     32  H2  GLC A   2       3.642   5.285   0.957  1.00  0.00
+ATOM     33  H3  GLC A   2       5.709   5.676   1.642  1.00  0.00
+ATOM     34  H4  GLC A   2       5.709   4.767   3.830  1.00  0.00
+ATOM     35  H5  GLC A   2       5.709   2.123   2.457  1.00  0.00
+ATOM     36  H61 GLC A   2       7.084   2.208   4.579  1.00  0.00
+ATOM     37  H62 GLC A   2       5.709   2.923   5.408  1.00  0.00
+ATOM     38  C1  GLC A   3       7.992   5.434   3.287  1.00  0.00
+ATOM     39  C2  GLC A   3       9.517   5.434   3.287  1.00  0.00
+ATOM     40  C3  GLC A   3      10.091   6.859   3.287  1.00  0.00
+ATOM     41  C4  GLC A   3       9.517   7.426   4.500  1.00  0.00
+ATOM     42  C5  GLC A   3       7.992   7.426   4.500  1.00  0.00
+ATOM     43  C6  GLC A   3       7.417   7.984   5.792  1.00  0.00
+ATOM     44  O2  GLC A   3      10.000   4.916   2.074  1.00  0.00
+ATOM     45  O3  GLC A   3      11.517   6.859   3.287  1.00  0.00
+ATOM     46  O4  GLC A   3      10.000   8.734   4.787  1.00  0.00
+ATOM     47  O5  GLC A   3       7.517   6.061   4.500  1.00  0.00
+ATOM     48  O6  GLC A   3       5.991   7.893   5.792  1.00  0.00
+ATOM     49  H1  GLC A   3       7.643   5.783   4.266  1.00  0.00
+ATOM     50  H2  GLC A   3       9.876   4.913   4.181  1.00  0.00
+ATOM     51  H3  GLC A   3       9.809   7.392   2.372  1.00  0.00
+ATOM     52  H4  GLC A   3       9.809   6.894   5.415  1.00  0.00
+ATOM     53  H5  GLC A   3       7.709   7.977   3.606  1.00  0.00
+ATOM     54  H61 GLC A   3       7.709   9.037   5.868  1.00  0.00
+ATOM     55  H62 GLC A   3       7.817   7.492   6.686  1.00  0.00
+END`;
+
+                    celluloseMoleculeViewer.addModel(cellulosePDB, "pdb");
+                    
+                    // 设置明显的样式
+                    celluloseMoleculeViewer.setStyle({}, {stick:{radius:0.2, colorscheme:'blueCarbon'}, sphere:{scale:0.4}});
+                    
+                    // 颜色设置
+                    celluloseMoleculeViewer.setStyle({elem: 'C'}, {stick:{color:'#1976D2'}});
+                    celluloseMoleculeViewer.setStyle({elem: 'O'}, {stick:{color:'#FF5252'}, sphere:{scale:0.4, color:'#FF5252'}});
+                    celluloseMoleculeViewer.setStyle({elem: 'H'}, {stick:{radius:0.05, color:'#FFFFFF'}, sphere:{scale:0.2, color:'#FFFFFF'}});
+                    
+                    // 高亮显示葡萄糖单元间的β-1,4连接
+                    celluloseMoleculeViewer.setStyle({serial: [10, 20, 28, 38, 46]}, {stick:{color:'#FFC107', radius:0.25}, sphere:{scale:0.5, color:'#FFC107'}});
+                    
+                    // 调整视角确保分子居中且可见
+                    celluloseMoleculeViewer.zoomTo();
+                    celluloseMoleculeViewer.zoom(0.8);
+                    celluloseMoleculeViewer.rotate(30, {x:1, y:0, z:0});
+                    celluloseMoleculeViewer.rotate(20, {x:0, y:1, z:0});
+                    celluloseMoleculeViewer.center();
+                    celluloseMoleculeViewer.render();
+                    
+                    // 隐藏加载提示
+                    $('#cellulose-loading').hide();
+                    
+                    // 自动旋转动画
+                    animateMolecule(celluloseMoleculeViewer);
+                    
+                    console.log('纤维素3D分子模型已成功加载 (PDB方式)');
+                } catch (err) {
+                    console.error('使用PDB加载纤维素分子时出错:', err);
+                    
+                    // 如果PDB方式失败，尝试SMILES方式（备选方案）
+                    try {
+                        // Cellulose 三聚体 SMILES（简化结构，3个葡萄糖单位通过 β-1,4 键连接）
+                        const celluloseTrimerSmiles = 'OC[C@H]1O[C@@H](O[C@H]2[C@@H](O[C@H]3[C@@H](CO)O[C@H](O)[C@@H](O)[C@H]3O)[C@H](O)[C@@H](O)[C@H]2O)[C@H](O)[C@@H](O)[C@H]1O';
+
+                        $3Dmol.download("smiles:" + celluloseTrimerSmiles, celluloseMoleculeViewer, {}, function () {
+                            try {
+                                // 设置更明显的样式
+                                celluloseMoleculeViewer.setStyle({}, {stick:{radius:0.2, colorscheme:'blueCarbon'}, sphere:{scale:0.4}});
+                                
+                                // 设置原子颜色突出显示
+                                celluloseMoleculeViewer.setColorByElement({'C':'#1976D2', 'O':'#FF5252', 'H':'#FFFFFF'});
+                                
+                                // 调整视角确保分子居中且可见
+                                celluloseMoleculeViewer.zoomTo();
+                                celluloseMoleculeViewer.zoom(0.8); // 适度缩小以便看清整个结构
+                                celluloseMoleculeViewer.center(); // 确保分子位于中心
+                                celluloseMoleculeViewer.render();
+                                
+                                // 隐藏加载提示
+                                $('#cellulose-loading').hide();
+                                
+                                // 自动旋转动画
+                                animateMolecule(celluloseMoleculeViewer);
+                                
+                                console.log('纤维素3D分子模型已成功加载 (SMILES方式)');
+                            } catch (err) {
+                                console.error('设置纤维素分子样式时出错:', err);
+                                $('#cellulose-loading').text('错误：' + err.message);
+                            }
+                        }, function(error) {
+                            console.error('加载SMILES格式时出错:', error);
+                            $('#cellulose-loading').text('错误：无法加载分子结构');
+                        });
+                    } catch (smileErr) {
+                        console.error('SMILES加载也失败:', smileErr);
+                        $('#cellulose-loading').text('错误：无法加载分子结构');
+                    }
+                }
+            } catch (error) {
+                console.error('加载纤维素3D模型时出错:', error);
+                $('#cellulose-loading').text('错误：' + error.message);
+            }
+        }
+        
+        // 分子自动旋转
+        function animateMolecule(viewer) {
+            if (viewer) {
+                viewer.rotate(0.5);
+                viewer.render();
+                requestAnimationFrame(() => animateMolecule(viewer));
+            }
+        }
+        
+        // 设置分子显示样式
+        function setMoleculeStyle(style, type) {
+            let viewer, colorScheme, carbonColor;
+            
+            if (type === 'pla') {
+                viewer = plaMoleculeViewer;
+                colorScheme = 'cyanCarbon';
+                carbonColor = '#66BB6A';
+            } else if (type === 'pha') {
+                viewer = phaMoleculeViewer;
+                colorScheme = 'greenCarbon';
+                carbonColor = '#388E3C';
+            } else if (type === 'starch') {
+                viewer = starchMoleculeViewer;
+                colorScheme = 'yellowCarbon';
+                carbonColor = STARCH_COLOR;
+            } else if (type === 'cellulose') {
+                viewer = celluloseMoleculeViewer;
+                colorScheme = 'blueCarbon';
+                carbonColor = '#1976D2';
+            }
+            
+            if (!viewer) return;
+            
+            viewer.setStyle({}, {});
+            if (style === "stick") {
+                viewer.setStyle({}, {stick:{radius:0.2, colorscheme:colorScheme}});
+            } else if (style === "sphere") {
+                viewer.setStyle({}, {sphere:{scale:0.6}});
+            } else if (style === "line") {
+                viewer.setStyle({}, {line:{linewidth:3}});
+            }
+            viewer.setColorByElement({'C':carbonColor, 'O':'#FF0000', 'H':'#FFFFFF'});
+            viewer.render();
+        }
+        
+        // 重置分子视角
+        function resetMoleculeView(type) {
+            let viewer, zoomLevel;
+            
+            if (type === 'pla') {
+                viewer = plaMoleculeViewer;
+                zoomLevel = 2.0;
+            } else if (type === 'pha') {
+                viewer = phaMoleculeViewer;
+                zoomLevel = 2.0;
+            } else if (type === 'starch') {
+                viewer = starchMoleculeViewer;
+                zoomLevel = 1.0;
+            } else if (type === 'cellulose') {
+                viewer = celluloseMoleculeViewer;
+                zoomLevel = 0.8;
+            }
+            
+            if (!viewer) return;
+            
+            viewer.zoomTo();
+            viewer.zoom(zoomLevel);
+            viewer.center();
+            viewer.render();
+        }
+
+        // Process Step Animation Functions
+        function animateStep1(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            // 获取animation-container
+            const animContainer = document.getElementById('animation-container');
+            const cellWall = document.getElementById('cell-wall');
+            const phaseIndicator = document.getElementById('phase-indicator');
+            const pureCellulose = document.getElementById('pure-cellulose');
+            const pretreatmentEffect = document.getElementById('pretreatment-effect');
+            const alkaliEffect = document.getElementById('alkali-effect');
+            const bleachingEffect = document.getElementById('bleaching-effect');
+            
+            // 全局变量
+            let molecules = [];
+            let animationRunning = false;
+            let currentPhase = 0;
+            let animationTimer;
+            
+            // 初始化函数
+            function initialize() {
+                // 清空旧分子
+                molecules = [];
+                cellWall.innerHTML = '';
+                
+                // 创建分子
+                createMolecules();
+                
+                // 重置纯纤维素和阶段指示器
+                pureCellulose.style.opacity = '0';
+                phaseIndicator.style.opacity = '0';
+                phaseIndicator.textContent = '';
+                
+                // 重置特效
+                pretreatmentEffect.style.opacity = '0';
+                alkaliEffect.style.opacity = '0';
+                bleachingEffect.style.opacity = '0';
+                
+                // 重置细胞壁
+                cellWall.style.transform = 'scale(1)';
+                cellWall.style.opacity = '1';
+            }
+            
+            // 创建分子
+            function createMolecules() {
+                // 创建纤维素分子
+                for (let i = 0; i < 15; i++) {
+                    const cellulose = document.createElement('div');
+                    cellulose.className = 'cellulose';
+                    cellulose.style.left = Math.random() * 320 + 'px';
+                    cellulose.style.top = Math.random() * 100 + 'px';
+                    cellulose.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    cellWall.appendChild(cellulose);
+                    
+                    molecules.push({
+                        element: cellulose,
+                        type: 'cellulose',
+                        x: parseFloat(cellulose.style.left),
+                        y: parseFloat(cellulose.style.top),
+                        rotation: Math.random() * 360
+                    });
+                }
+                
+                // 创建木质素分子
+                for (let i = 0; i < 20; i++) {
+                    const lignin = document.createElement('div');
+                    lignin.className = 'lignin';
+                    lignin.style.left = Math.random() * 320 + 'px';
+                    lignin.style.top = Math.random() * 100 + 'px';
+                    cellWall.appendChild(lignin);
+                    
+                    molecules.push({
+                        element: lignin,
+                        type: 'lignin',
+                        x: parseFloat(lignin.style.left),
+                        y: parseFloat(lignin.style.top)
+                    });
+                }
+                
+                // 创建半纤维素分子
+                for (let i = 0; i < 25; i++) {
+                    const hemicellulose = document.createElement('div');
+                    hemicellulose.className = 'hemicellulose';
+                    hemicellulose.style.left = Math.random() * 320 + 'px';
+                    hemicellulose.style.top = Math.random() * 100 + 'px';
+                    hemicellulose.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    cellWall.appendChild(hemicellulose);
+                    
+                    molecules.push({
+                        element: hemicellulose,
+                        type: 'hemicellulose',
+                        x: parseFloat(hemicellulose.style.left),
+                        y: parseFloat(hemicellulose.style.top),
+                        rotation: Math.random() * 360
+                    });
+                }
+            }
+            
+            // 显示阶段提示
+            function showPhase(text) {
+                phaseIndicator.textContent = text;
+                phaseIndicator.style.opacity = '1';
+            }
+            
+            // 隐藏阶段提示
+            function hidePhase() {
+                phaseIndicator.style.opacity = '0';
+            }
+            
+            // 自动开始动画序列
+            function startAnimation() {
+                if (animationRunning) return;
+                
+                animationRunning = true;
+                currentPhase = 0;
+                
+                // 启动动画序列
+                runAnimationPhase();
+            }
+            
+            // 执行各个阶段的动画
+            function runAnimationPhase() {
+                currentPhase++;
+                
+                switch(currentPhase) {
+                    case 1:
+                        // 阶段1: 预处理
+                        showPhase("Case 1: Plant material pretreatment");
+                        phase1Animation();
+                        break;
+                    case 2:
+                        // 阶段2: 热碱处理
+                        showPhase("Case 2: Hot Alkali Treatment");
+                        phase2Animation();
+                        break;
+                    case 3:
+                        // 阶段3: 漂白处理
+                        showPhase("Case 3: Bleaching");
+                        phase3Animation();
+                        break;
+                    case 4:
+                        // 阶段4: 获取纯纤维素
+                        showPhase("Case 4: Obtaining pure cellulose");
+                        phase4Animation();
+                        break;
+                    default:
+                        // 动画结束
+                        setTimeout(() => {
+                            hidePhase();
+                            animationRunning = false;
+                            // 重新开始动画循环
+                            setTimeout(() => initialize(), 1000);
+                            setTimeout(() => startAnimation(), 2000);
+                        }, 3000);
+                        return;
+                }
+            }
+            
+            // 阶段1: 预处理动画
+            function phase1Animation() {
+                // 显示预处理特效
+                pretreatmentEffect.style.opacity = '0.3';
+                
+                // 分子开始振动
+                molecules.forEach(molecule => {
+                    molecule.element.style.animation = 'vibrate 0.3s infinite';
+                });
+                
+                // 细胞壁轻微变形
+                cellWall.style.transform = 'scale(1.05)';
+                
+                setTimeout(() => {
+                    // 移除预处理特效
+                    pretreatmentEffect.style.opacity = '0';
+                    
+                    // 停止分子振动，但保持轻微移动
+                    molecules.forEach(molecule => {
+                        molecule.element.style.animation = 'vibrate 1s infinite';
+                        
+                        // 给每个分子一个小的随机位移
+                        const currentX = parseFloat(molecule.element.style.left);
+                        const currentY = parseFloat(molecule.element.style.top);
+                        
+                        molecule.element.style.left = (currentX + (Math.random() * 30 - 15)) + 'px';
+                        molecule.element.style.top = (currentY + (Math.random() * 30 - 15)) + 'px';
+                    });
+                    
+                    // 进入下一阶段
+                    setTimeout(() => runAnimationPhase(), 1000);
+                }, 3000);
+            }
+            
+            // 阶段2: 热碱处理动画
+            function phase2Animation() {
+                // 显示热碱处理特效
+                alkaliEffect.style.opacity = '0.6';
+                
+                // 木质素分子开始淡出
+                molecules.forEach(molecule => {
+                    if (molecule.type === 'lignin') {
+                        setTimeout(() => {
+                            molecule.element.style.opacity = '0';
+                            molecule.element.style.transform = 'scale(0.5)';
+                        }, Math.random() * 1500);
+                    }
+                });
+                
+                setTimeout(() => {
+                    // 半纤维素分子开始淡出
+                    molecules.forEach(molecule => {
+                        if (molecule.type === 'hemicellulose') {
+                            setTimeout(() => {
+                                molecule.element.style.opacity = '0';
+                                molecule.element.style.transform = 'translateY(20px) scale(0.5)';
+                            }, Math.random() * 1500);
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        // 移除热碱处理特效
+                        alkaliEffect.style.opacity = '0';
+                        
+                        // 纤维素分子轻微移动，靠近中心
+                        molecules.forEach(molecule => {
+                            if (molecule.type === 'cellulose') {
+                                // 让纤维素分子更加合理地分布
+                                const centerX = 160;
+                                const centerY = 50;
+                                const currentX = parseFloat(molecule.element.style.left);
+                                const currentY = parseFloat(molecule.element.style.top);
+                                
+                                // 向中心移动
+                                const newX = currentX + (centerX - currentX) * 0.3;
+                                const newY = currentY + (centerY - currentY) * 0.3;
+                                
+                                molecule.element.style.left = newX + 'px';
+                                molecule.element.style.top = newY + 'px';
+                            }
+                        });
+                        
+                        // 进入下一阶段
+                        setTimeout(() => runAnimationPhase(), 1000);
+                    }, 2000);
+                }, 2000);
+            }
+            
+            // 阶段3: 漂白处理动画
+            function phase3Animation() {
+                // 显示漂白处理特效
+                bleachingEffect.style.opacity = '0.7';
+                
+                // 纤维素分子开始向中心聚集
+                molecules.forEach(molecule => {
+                    if (molecule.type === 'cellulose') {
+                        setTimeout(() => {
+                            // 移动到中心位置附近
+                            const centerX = 160;
+                            const centerY = 50;
+                            const offsetX = (Math.random() - 0.5) * 60;
+                            const offsetY = (Math.random() - 0.5) * 40;
+                            
+                            molecule.element.style.left = (centerX + offsetX) + 'px';
+                            molecule.element.style.top = (centerY + offsetY) + 'px';
+                            
+                            // 增加发光效果
+                            molecule.element.style.boxShadow = '0 0 10px rgba(33, 150, 243, 0.8)';
+                            molecule.element.style.backgroundColor = '#42A5F5';
+                            
+                            // 统一旋转方向
+                            molecule.element.style.transform = 'rotate(0deg)';
+                        }, Math.random() * 1500);
+                    }
+                });
+                
+                setTimeout(() => {
+                    // 移除漂白处理特效
+                    bleachingEffect.style.opacity = '0';
+                    
+                    // 进入下一阶段
+                    setTimeout(() => runAnimationPhase(), 1000);
+                }, 3500);
+            }
+            
+            // 阶段4: 获取纯纤维素动画
+            function phase4Animation() {
+                // 开始淡出细胞壁容器
+                cellWall.style.opacity = '0.2';
+                
+                // 纯纤维素逐渐显现并波动
+                pureCellulose.style.opacity = '1';
+                pureCellulose.style.animation = 'wave 2s infinite ease-in-out';
+                
+                // 添加小链段到纯纤维素上
+                for (let i = 0; i < 10; i++) {
+                    const segment = document.createElement('div');
+                    segment.style.position = 'absolute';
+                    segment.style.width = '10px';
+                    segment.style.height = '3px';
+                    segment.style.backgroundColor = '#90CAF9';
+                    segment.style.borderRadius = '2px';
+                    segment.style.top = (Math.random() * 12 - 6) + 'px';
+                    segment.style.left = (20 + i * 27) + 'px';
+                    segment.style.animation = 'wave 2s infinite ease-in-out';
+                    segment.style.animationDelay = (i * 0.2) + 's';
+                    pureCellulose.appendChild(segment);
+                }
+                
+                // 淡出所有原始分子
+                molecules.forEach(molecule => {
+                    molecule.element.style.opacity = '0';
+                });
+                
+                // 5秒后进入动画结束
+                setTimeout(() => runAnimationPhase(), 5000);
+            }
+            
+            // 执行初始化和启动动画
+            initialize();
+            startAnimation();
+        }
+
+        function animateStep2(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            const rect = container.getBoundingClientRect();
+            const numStrands = 5;
+            const startY = rect.height / 2 - (numStrands * 10 / 2);
+
+            for (let i = 0; i < numStrands; i++) {
+                 const strand = document.createElement('div');
+                 strand.className = 'step2-strand';
+                 strand.style.left = '10px';
+                 strand.style.top = `${startY + i * 10}px`;
+                 strand.style.width = '0px';
+                 strand.style.backgroundColor = PROCESS_COLORS[i % PROCESS_COLORS.length];
+                 container.appendChild(strand);
+
+                 setTimeout(() => {
+                     strand.style.width = `${rect.width - 20}px`;
+                 }, 200 + Math.random() * 400);
+             }
+             setTimeout(() => animateStep2(containerId), 4000);
+        }
+
+        function animateStep3(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            const rect = container.getBoundingClientRect();
+            const numSegments = 8;
+            const segmentWidth = 15;
+            const segmentSpacing = 5;
+            const totalChainWidth = numSegments * (segmentWidth + segmentSpacing);
+            const startX = (rect.width - totalChainWidth) / 2;
+            const startY = rect.height / 2 - 3;
+
+            for (let i = 0; i < numSegments; i++) {
+                const segment = document.createElement('div');
+                segment.className = 'step3-segment';
+                const initialPos = getRandomPosition(container, segmentWidth);
+                segment.style.left = `${initialPos.x}px`;
+                segment.style.top = `${initialPos.y}px`;
+                segment.style.transform = `rotate(${Math.random() * 180 - 90}deg)`;
+                segment.style.backgroundColor = PHA_COLOR;
+
+                container.appendChild(segment);
+
+                setTimeout(() => {
+                    segment.style.opacity = '1';
+                    segment.style.left = `${startX + i * (segmentWidth + segmentSpacing)}px`;
+                    segment.style.top = `${startY}px`;
+                    segment.style.transform = 'rotate(0deg)';
+                }, 300 + Math.random() * 500);
+            }
+             setTimeout(() => animateStep3(containerId), 4500);
+        }
+
+        // Initialization
+        window.addEventListener('load', function() {
+            // 初始化3D分子模型
+            initStarchMolecule();
+            initPLAMolecule();
+            initPHAMolecule();
+            initCelluloseMolecule();
+
+            // Initialize Process Animations
+            animateStep1('step1-animation');
+            animateStep2('step2-animation');
+            animateStep3('step3-animation');
+
+        });
+
+    </script>
+</body>
+</html> 
